@@ -13,7 +13,9 @@ var gulp = require('gulp'),
     pngquant    = require('imagemin-pngquant'),
     cssnano     = require('gulp-cssnano'),
     rename      = require('gulp-rename'),
-    del         = require('del');
+    del         = require('del'),
+    inject      = require("gulp-inject"),
+    path        = require('path');
 
 gulp.task('less', function(){
     return gulp.src('src/less/base.less')
@@ -57,7 +59,7 @@ gulp.task('browser-sync', function() {
         server: {
             baseDir: 'src'
         },
-        startPath: "./mail.html",
+        startPath: "./yandex.html",
         port: 9191,
         files: [
             "./*.html"
@@ -85,8 +87,9 @@ gulp.task('svgstore', () => {
         return file.contents.toString();
     }
     return gulp
+        .src("src/*.html")
         .pipe(inject(svgs, { transform: fileContents }))
-        .pipe(gulp.dest("dist/icons"));
+        .pipe(gulp.dest("src"));
 });
 
 gulp.task('img', function() {
@@ -100,31 +103,13 @@ gulp.task('img', function() {
         .pipe(gulp.dest('dist/img'));
 });
 
-gulp.task('watch', ['yandex','css', 'browser-sync', 'img', 'less'], function() {
+gulp.task('watch', ['yandex','css', 'browser-sync', 'less'], function() {
     gulp.watch('src/less/**/*.less', ['less']);
-    gulp.watch('src/*.html', browserSync.reload);
+    gulp.watch('src/yandex.html', browserSync.reload);
     gulp.watch('src/js/**/*.js', browserSync.reload);
 });
 
 gulp.task('default', ['watch']);
-
-gulp.task('build', ['clean', 'img', 'less'], function() {
-
-    var buildCss = gulp.src([
-        'src/css/base.css'
-    ])
-        .pipe(gulp.dest('dist/css'))
-
-    var buildFonts = gulp.src('src/fonts/**/*')
-        .pipe(gulp.dest('dist/fonts'))
-
-    var buildJs = gulp.src('src/js/**/*')
-        .pipe(gulp.dest('dist/js'))
-
-    var buildHtml = gulp.src('src/*.html')
-        .pipe(gulp.dest('dist'));
-
-});
 
 gulp.task('clear', function () {
     return cache.clearAll();
@@ -133,6 +118,12 @@ gulp.task('clear', function () {
 gulp.task('clean', function() {
     return del.sync('dist');
 });
+
+
+
+
+
+
 
 
 
